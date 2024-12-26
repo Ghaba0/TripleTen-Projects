@@ -1,0 +1,26 @@
+import requests
+import pandas as pd
+from bs4 import BeautifulSoup
+
+# URL of the website
+url = "https://practicum-content.s3.us-west-1.amazonaws.com/data-analyst-eng/moved_chicago_weather_2017.html"
+
+# Send a GET request to the URL
+response = requests.get(url)
+
+# Parse the HTML content using BeautifulSoup
+soup = BeautifulSoup(response.content, 'html.parser')
+
+# Find the table with weather data
+weather_table = soup.find('table', {'id': 'weather_records'})
+
+# Extract data and create a DataFrame
+headers = [header.text.strip() for header in weather_table.find('thead').find('tr').find_all('th')]
+data_rows = weather_table.find('tbody').find_all('tr')
+data = [[cell.text.strip() for cell in row.find_all('td')] for row in data_rows]
+
+# Create DataFrame
+weather_records = pd.DataFrame(data, columns=headers)
+
+# Print the DataFrame
+print(weather_records)
